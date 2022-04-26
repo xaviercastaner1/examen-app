@@ -4,6 +4,12 @@
 
 @section('content')
 
+@if($msg)
+<div class="alert {{$alert}}" role="alert">
+  {{$msg}}
+</div>
+@endif
+
 <div class="row mb-5">
     <h1>Afegir Casal</h1>
     <hr>

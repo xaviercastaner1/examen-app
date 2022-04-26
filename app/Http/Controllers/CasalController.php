@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Casal;
 use App\Models\Ciutat;
+use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Session;
@@ -13,22 +14,22 @@ class CasalController extends Controller
 {
     public function index(Request $request)
     {
-        /*$users = DB::table('casals')
-            ->join('ciutats', 'casals.id', '=', 'contacts.user_id')
-            ->join('orders', 'users.id', '=', 'orders.user_id')
-            ->select('users.*', 'contacts.phone', 'orders.price')
-            ->get();*/
+        $msg = Session::get('msg') ?? '';
+        $alert = Session::get('alert') ?? '';
 
         $casals = Casal::join('ciutats', 'casals.ciutat', '=', 'ciutats.id')
         ->select('casals.*', 'ciutats.nom as nomCiutat')
         ->get() ?? [];
-        return view('casals.index', compact('casals'));
+        return view('casals.index', compact('casals', 'msg', 'alert'));
     }
 
     public function create()
     {
+        $msg = Session::get('msg') ?? '';
+        $alert = Session::get('alert') ?? '';
+
         $ciutats = Ciutat::all();
-        return view('casals.create', compact('ciutats'));
+        return view('casals.create', compact('ciutats', 'msg', 'alert'));
     }
 
     public function store(Request $request)
@@ -38,6 +39,14 @@ class CasalController extends Controller
         $data_final = $request->input('data_final');
         $n_places = $request->input('n_places');
         $ciutat = $request->input('ciutat');
+        
+        
+        /*if(!new DateTime($data_inici) < new DateTime($data_final)) {
+            return redirect()->route('casal.index')->with([
+                'msg' => 'Data d\'inici més gran que data final.',
+                'alert' => 'alert-warning'
+            ]);
+        }*/
 
         $result = Casal::create([
             'nom' => $nom,
@@ -48,7 +57,10 @@ class CasalController extends Controller
             
         ]);
 
-        return redirect()->route('casal.index')->with('status', $result ? 'Casal creat' : 'Error creant casal');
+        return redirect()->route('casal.index')->with([
+            'msg' => $result ? 'Casal creat' : 'Error creant casal',
+            'alert' => $result ? 'alert-primary' : 'alert-warning'
+        ]);
         
     }
 
@@ -59,12 +71,17 @@ class CasalController extends Controller
 
     public function edit($id)
     {
+        $msg = Session::get('msg') ?? '';
+        $alert = Session::get('alert') ?? '';
+
         $casal = Casal::findOrFail($id);
         $ciutats = Ciutat::all();
 
         return view('casals.edit', compact(
             'casal', 
-            'ciutats'
+            'ciutats',
+            'msg',
+            'alert'
         ));
     }
 
@@ -85,13 +102,19 @@ class CasalController extends Controller
             'ciutat' => $ciutat,
         ]);
 
-        return redirect()->route('casal.index')->with('status', $result ? 'Casal creat' : 'Error creant casal');
+        return redirect()->route('casal.index')->with([
+            'msg' => $result ? 'Casal editat' : 'Error editant casal',
+            'alert' => $result ? 'alert-primary' : 'alert-warning'
+        ]);
         
     }
 
     public function destroy($id)
     {
         $result = Casal::destroy($id);
-        return redirect()->route('casal.index')->with('status', $result ? 'Casal creat' : 'Error creant casal');
+        return redirect()->route('casal.index')->with([
+            'msg' => $result ? 'Casal eliminat' : 'Error eliminant casal',
+            'alert' => $result ? 'alert-primary' : 'alert-warning'
+        ]);
     }
 }

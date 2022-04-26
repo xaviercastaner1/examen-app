@@ -4,6 +4,12 @@
 
 @section('content')
 
+@if($msg)
+<div class="alert {{$alert}}" role="alert">
+  {{$msg}}
+</div>
+@endif
+
 <div class="row mb-5">
     <h1 class="text-center">Casals d'Estiu</h1>
     <a href="{{route('casal.create')}}" class="btn btn-primary w-25 mx-auto">Afegir</a>
