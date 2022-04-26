@@ -14,6 +14,10 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // \App\Models\User::factory(10)->create();
+        $this->call(CiutatSeeder::class);
+        $this->command->info('Ciutat table seeded!');
+
+        $this->call(CasalSeeder::class);
+        $this->command->info('Casal table seeded!');
     }
 }
